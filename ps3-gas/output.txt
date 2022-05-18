@@ -1,0 +1,189 @@
+import math
+
+def distance(x1,y1,x2,y2):
+    return math.sqrt((x2-x1)**2+(y2-y1)**2)
+
+def detect_collisions_in_square(balls):
+    """
+    Detect any pairs of balls that are colliding.
+    Returns a set of ball_pairs.
+    """
+
+    set_of_collisions = set()
+
+    for i in range(len(balls)):
+        b1 = balls[i]
+        for j in range(i):
+            b2 = balls[j]
+            if gas.colliding(b1, b2):
+                set_of_collisions.add(gas.ball_pair(b1, b2))
+
+    return set_of_collisions
+number_balls=200
+world_min_x = -200.0*number_balls**.5  # minimum x in world coordinates
+world_max_x = +200.0*number_balls**.5  # maximum x in world coordinates
+world_min_y = -200.0*number_balls**.5  # minimum y in world coordinates
+world_max_y = +200.0*number_balls**.5  # maximum y in world coordinates
+def ball_in_square(b,xb,yb,v=False):
+    min_x=xb*256
+    max_x=(xb+1)*256
+    min_y=yb*256
+    max_y=(yb+1)*256
+    if v:
+
+        print("Check",b.x,b.y,b.radius,min_x,min_y,256,256,v)
+
+    #print("Minimum_x",min_x,"Max_Y",max_x,"MIN_Y",min_y,"MAX_Y",max_y)
+    #print("b.x-b.radius,b.x+b.radius,b.y-b.radius,b.y+b.radius")
+    #print(b.x-b.radius,b.x+b.radius,b.y-b.radius,b.y+b.radius)
+    #print("b.x,b.y,b.radius")
+    #print(b.x,b.y,b.radius)
+    if b.x < min_x:
+        if b.y < min_y:
+            if v: print("HERE: 1",max_x,min_y,b.x,b.y)
+
+            dist=distance(min_x,min_y,b.x,b.y)
+            if b.radius >= dist:
+                return True
+            else:
+                return False
+        elif b.y<=max_y:
+            if v: print("HERE: 2",max_x,min_y,b.x,b.y)
+            if b.x+b.radius >= min_x:
+
+                return True
+            else:
+                return False
+
+        else:
+            dist=distance(min_x,max_y,b.x,b.y)
+            if v: print("HERE: 3",max_x,min_y,b.x,b.y)
+            if b.radius >= dist:
+                return True
+            else:
+                return False
+    elif b.x<=max_x:
+        if b.y < min_y:
+            if v: print("HERE: 4",max_x,min_y,b.x,b.y)
+            if b.y+b.radius >= min_y:
+                return True
+            else:
+                return False
+
+        elif b.y<=max_y:
+            if v: print("HERE: 5",max_x,min_y,b.x,b.y)
+            return True
+        else:
+            if v: print("HERE: 6",max_x,min_y,b.x,b.y)
+            if b.y-b.radius <= max_y:
+                return True
+            else:
+                return False
+    else:
+        if b.y < min_y:
+            if v: print("HERE: 7",max_x,min_y,b.x,b.y)
+            dist=distance(max_x,min_y,b.x,b.y)
+            if b.radius >= dist:
+                return True
+            else:
+                return False
+        elif b.y<=max_y:
+            if v: print("HERE: 8",max_x,min_y,b.x,b.y)
+            if b.x-b.radius <= max_x:
+                return True
+            else:
+                return False
+
+        else:
+            dist=distance(max_x,max_y,b.x,b.y)
+            if v: print("HERE: 9",max_x,min_y,b.x,b.y)
+            if b.radius >= dist:
+                return True
+            else:
+                return False
+    return False
+
+
+def detect_collisions(balls,v=False):
+    """
+    Detect any pairs of balls that are colliding.
+    Returns a set of ball_pairs.
+    """
+    test=False
+    dict_of_balls = {}
+    ball_collection = []
+    if test:
+        col=detect_collisions_in_square(balls)
+    coord=()
+    set_of_collisions=set()
+    for b in balls:
+
+        xb = int(b.x/256)
+        if b.x < 0:
+            xb=xb-1
+        yb = int(b.y/256)
+        if b.y < 0:
+            yb=yb-1
+
+
+
+        for x in range(xb-1,xb+2):
+            for y in range(yb-1,yb+2):
+                key=(x,y)
+                if v:
+
+                    print(b.x,b.y,b.radius,x,y)
+                flag=False
+                if ball_in_square(b,x,y,v):
+                    flag=True
+                    if v:
+                        print(b.x,b.y,b.radius,x,y,True)
+
+                    if key not in dict_of_balls.keys():
+                        dict_of_balls[key] =[]
+                    dict_of_balls[key].append(b)
+                    #print(b.x,b.y,b.radius,x,y,False)
+    for key in dict_of_balls.keys():
+        set_of_collisions.update(detect_collisions_in_square(dict_of_balls[key]))
+    ace=[]
+    final=set()
+    for element in set_of_collisions:
+        b1=element.b1
+        b2=element.b2
+        if (b1,b2)not in ace:
+            ace.append((b1,b2))
+            final.add(element)
+    set_of_collisions=final
+    if test:
+
+        temp=set()
+        ver_set=set()
+        for b_pairs in col:
+            temp.add((b_pairs.b1,b_pairs.b2))
+        for c_pairs in set_of_collisions:
+            ver_set.add((c_pairs.b1,c_pairs.b2))
+
+        if len(col)!=len(set_of_collisions):
+            print("ABC",v,len(col),len(set_of_collisions))
+            if v:
+                return set_of_collisions
+            new_balls= []
+
+            for element in set_of_collisions:
+                b1=element.b1
+                b2=element.b2
+
+                match=False
+                for v_elemen in set_of_collisions:
+                    if b1 == v_element.b1 and b2== v_element.b2:
+                        match=True
+                        #print(b1, b2,v_element.b1,v_element.b2)
+                        break
+                if not match:
+                    print("Match Not Found")
+
+                    detect_collisions([b1,b2],True)
+    #print(set_of_collisions)
+    return set_of_collisions
+
+import gas
